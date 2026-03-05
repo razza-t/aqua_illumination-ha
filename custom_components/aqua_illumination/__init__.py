@@ -3,18 +3,19 @@ from datetime import timedelta
 import logging
 import voluptuous as vol
 
-from homeassistant.const import CONF_HOST, CONF_NAME
+from homeassistant.const import CONF_HOST, CONF_NAME, Platform
 from homeassistant.helpers import discovery
 import homeassistant.helpers.config_validation as cv
 from homeassistant.util import Throttle, dt
 
-
-REQUIREMENTS = ['AquaIPy==2.0.1']
 _LOGGER = logging.getLogger(__name__)
 
 ATTR_LAST_UPDATE = 'last_update'
 DOMAIN = 'aqua_illumination'
 DATA_INDEX = "data_" + DOMAIN
+
+# 2026.3 Standard: Explicitly define platforms
+PLATFORMS = [Platform.LIGHT, Platform.SWITCH, Platform.SENSOR]
 
 CONFIG_SCHEMA = vol.Schema({
     DOMAIN: vol.All(
@@ -25,29 +26,30 @@ CONFIG_SCHEMA = vol.Schema({
     )
 }, extra=vol.ALLOW_EXTRA)
 
-DEVICE_TYPES = ['light', 'switch', 'sensor']
 SCAN_INTERVAL = timedelta(seconds=10)
-
 
 async def async_setup(hass, hass_config):
     """Setup the AquaIllumination component"""
-
     if DATA_INDEX not in hass.data:
         hass.data[DATA_INDEX] = {}
 
-    for config in hass_config.get(DOMAIN, []):
+    conf = hass_config.get(DOMAIN)
+    if conf is None:
+        return True
+
+    for config in conf:
         await _async_setup_ai_device(hass, hass_config, config)
 
-    for device in DEVICE_TYPES:
-        hass.async_create_task(discovery.async_load_platform(
-            hass, device, DOMAIN, config, hass_config))
+    # Modern discovery loop
+    for platform in PLATFORMS:
+        hass.async_create_task(
+            discovery.async_load_platform(hass, platform, DOMAIN, {}, hass_config)
+        )
 
     return True
 
-
 async def _async_setup_ai_device(hass, hass_config, config):
     """Setup an individual device"""
-
     host = config.get(CONF_HOST)
     name = config.get(CONF_NAME)
 
@@ -60,13 +62,12 @@ async def _async_setup_ai_device(hass, hass_config, config):
     await device.async_update()
     hass.data[DATA_INDEX][host] = device
 
-
 class AIData:
     """Class for handling data from AI devices and caching."""
 
     def __init__(self, host, name, throttle):
-
-        from aquaipy import AquaIPy
+        # PATCH: Use local import for bundled library
+        from .aquaipy import AquaIPy
 
         self.attr = {}
         self._connected = False
@@ -88,44 +89,35 @@ class AIData:
     
     @property
     def connected(self):
-
         return self._connected
 
     @property
     def colors_brightness(self):
-
         return self._colors_brightness
 
     @property
     def raw_device(self):
-
         return self._device
 
     @property
     def schedule_state(self):
-
         return self._schedule_state
 
-    @property
-    def throttle(self):
-
-        return self._t
-
     async def _async_update(self):
-
         if not self.connected:
-            from aquaipy.error import FirmwareError, ConnError, MustBeParentError
+            # PATCH: Use local import for error handling
+            from .aquaipy.error import FirmwareError, ConnError, MustBeParentError
             
             try:
                 await self._device.async_connect(self._host)
             except FirmwareError:
-                _LOGGER.error("Invalid firmware version for target device")
+                _LOGGER.error("Invalid firmware version for AI device: %s", self.name)
                 return
             except ConnError:
-                _LOGGER.error("Unable to connect to specified device, please verify the host name")
+                _LOGGER.error("Unable to connect to AI device at %s", self._host)
                 return
             except MustBeParentError:
-                _LOGGER.error("The specifed device must be the parent light, if paired. Please verify")
+                _LOGGER.error("The device at %s must be the parent light. Verify pairings.", self._host)
                 return
 
             self._connected = True
@@ -133,4 +125,5 @@ class AIData:
         self._colors_brightness = await self._device.async_get_colors_brightness()
         self._schedule_state = await self._device.async_get_schedule_state()
 
+        # Update last seen timestamp
         self.attr[ATTR_LAST_UPDATE] = dt.utcnow()
