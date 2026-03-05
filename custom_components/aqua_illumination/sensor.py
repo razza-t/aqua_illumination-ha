@@ -1,28 +1,29 @@
 import logging
-
-from homeassistant.const import DEVICE_CLASS_ILLUMINANCE
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorStateClass,
+)
+from homeassistant.const import PERCENTAGE
 from homeassistant.exceptions import PlatformNotReady
-from homeassistant.helpers.entity import Entity
-from homeassistant.util import dt
-from . import DATA_INDEX, ATTR_LAST_UPDATE, SCAN_INTERVAL
+from homeassistant.util import dt as dt_util
+
+from . import DATA_INDEX, ATTR_LAST_UPDATE
 
 _LOGGER = logging.getLogger(__name__)
 
-UNIT_PERCENT = '%'
-
 async def async_setup_platform(hass, config, add_entities, discovery_info=None):
-    """Setup the AquaIllumination light platform."""
-
+    """Setup the AquaIllumination sensor platform."""
     if DATA_INDEX not in hass.data:
         return False
 
     all_entities = []
 
     for host, device in hass.data[DATA_INDEX].items():
-
         if not device.connected:
             raise PlatformNotReady
 
+        # Fetch the available color channels
         colors = await device.raw_device.async_get_colors()
 
         for color in colors:
@@ -31,75 +32,53 @@ async def async_setup_platform(hass, config, add_entities, discovery_info=None):
     add_entities(all_entities)
 
 
-class AquaIlluminationChannelBrightness(Entity):
-    """Representation of an AquaIllumination light brightness"""
+class AquaIlluminationChannelBrightness(SensorEntity):
+    """Representation of an AquaIllumination light channel brightness sensor."""
+
+    # 2026.3 Standards: Define behavior via attributes
+    _attr_has_entity_name = True
+    _attr_native_unit_of_measurement = PERCENTAGE
+    _attr_state_class = SensorStateClass.MEASUREMENT
 
     def __init__(self, device, channel):
-        """Initialise the AquaIllumination channel"""
+        """Initialise the AI brightness sensor."""
         self._device = device
-        self._name = '{0} {1} brightness'.format(
-                self._device.name,
-                channel.replace('_', ' '))
-        self._state = None
         self._channel = channel
-        self._unique_id = "{0}_{1}_sensor".format(self._device.mac_addr, channel) 
-    
-    @property
-    def name(self):
-        """Get device name"""
+        # Format name as "Deep Blue Brightness"
+        self._attr_name = f"{channel.replace('_', ' ').title()} Brightness"
+        self._attr_unique_id = f"{self._device.mac_addr}_{channel}_sensor"
+        self._attr_native_value = None
 
-        return self._name
-    
     @property
     def should_poll(self):
-        """Polling required"""
-
+        """Polling required to stay in sync with the hardware."""
         return True
 
     @property
-    def state(self):
-        """Get device state"""
-
-        return self._state
-    
-    @property
-    def device_class(self):
-        return DEVICE_CLASS_ILLUMINANCE
-
-    @property
     def icon(self):
+        """Dynamic icon for brightness."""
         return "mdi:brightness-percent"
 
     @property
-    def unit_of_measurement(self):
-
-        return UNIT_PERCENT
-
-    @property
-    def unique_id(self):
-
-        return self._unique_id
-    
-    @property
-    def device_state_attributes(self):
-
+    def extra_state_attributes(self):
+        """Return the device attributes."""
         return self._device.attr
 
     @property
     def available(self):
-        """Return if the device is available"""
-
-        if ATTR_LAST_UPDATE not in self.device_state_attributes:
+        """Return if the device is reachable."""
+        if ATTR_LAST_UPDATE not in self._device.attr:
             return False
 
-        last_update = self.device_state_attributes[ATTR_LAST_UPDATE]
+        last_update = self._device.attr[ATTR_LAST_UPDATE]
+        # Allow a 3x window of the scan interval before marking unavailable
+        return (dt_util.utcnow() - last_update) < (3 * self._device.throttle)
 
-        return (dt.utcnow() - last_update) < (2 * self._device.throttle)
-    
     async def async_update(self):
-        """Fetch new state data for this channel"""
-
+        """Fetch the latest brightness percentage for this channel."""
         await self._device.async_update()
         
-        brightness = self._device.colors_brightness[self._channel]
-        self._state = float("{0:.2f}".format(brightness))
+        if self._device.colors_brightness and self._channel in self._device.colors_brightness:
+            brightness = self._device.colors_brightness[self._channel]
+            # Store as float with 2 decimal places
+            self._attr_native_value = round(float(brightness), 2)
