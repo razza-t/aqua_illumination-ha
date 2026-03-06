@@ -30,9 +30,9 @@ This integration is built on the incredible reverse-engineering work of the orig
 3. Add via **Settings > Devices & Services > Add Integration**.
 
 
-A sample configuration is shown below. This adds a light entity for each of the colour channels called <name>_<channel name>.
+A sample configuration is shown below. This adds a light entity for each of the colour channels called "<name>_<channel name>".
 
-Add this to your configuration.yaml. OBS! If you have patent/child light, you can only ad the parent light, if you try to ad the child as well the integration won't work.
+Add this to your configuration.yaml. OBS! If you have patent/child light, you can only add the parent light, if you try to add the child as well the integration won't work.
 
 ```YAML
 aqua_illumination:
