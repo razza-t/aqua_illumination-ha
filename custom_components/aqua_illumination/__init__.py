@@ -131,3 +131,20 @@ class AIData:
 
         # Update last seen timestamp
         self.attr[ATTR_LAST_UPDATE] = dt.utcnow()
+    async def async_setup_entry(hass, entry):
+        """Set up Aqua Illumination from a config entry."""
+        host = entry.data["host"]
+        name = entry.data["name"]
+
+        # Initialize your AIData class (same as before)
+        device = AIData(host, name, SCAN_INTERVAL)
+        await device.async_update()
+    
+        hass.data[DATA_INDEX][entry.entry_id] = device
+
+        # Forward the setup to the platforms (light, sensor, switch)
+        for platform in PLATFORMS:
+        hass.async_create_task(
+            hass.config_entries.async_forward_entry_setup(entry, platform)
+        )
+        return True
