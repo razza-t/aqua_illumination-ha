@@ -7,6 +7,36 @@ from homeassistant.const import CONF_HOST, CONF_NAME, Platform
 from homeassistant.helpers import discovery
 import homeassistant.helpers.config_validation as cv
 from homeassistant.util import Throttle, dt
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Set up Aqua Illumination from a UI config entry."""
+        if DATA_INDEX not in hass.data:
+                hass.data[DATA_INDEX] = {}
+
+                    host = entry.data.get("host")
+                        name = entry.data.get("name")
+
+                            # Initialize your device
+                                device = AIData(host, name, SCAN_INTERVAL)
+                                    await device.async_update()
+                                        
+                                            # Store the device using the unique entry_id
+                                                hass.data[DATA_INDEX][entry.entry_id] = device
+
+                                                    # Forward the setup to the platforms (light, switch, sensor)
+                                                        await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+                                                            return True
+
+                                                            async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+                                                                """Unload a config entry (when you delete it from the UI)."""
+                                                                    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+                                                                        if unload_ok:
+                                                                                hass.data[DATA_INDEX].pop(entry.entry_id)
+
+                                                                                    return unload_ok
 
 _LOGGER = logging.getLogger(__name__)
 
