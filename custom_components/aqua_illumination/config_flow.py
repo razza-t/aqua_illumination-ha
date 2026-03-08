@@ -4,7 +4,7 @@ from homeassistant.core import callback
 import homeassistant.helpers.config_validation as cv
 
 # FIX: Import the library from your new vendored folder
-from .aquaipy import AquaIPy
+from .aquaipy.aquaipy import AquaIPy
 from .aquaipy.error import ConnError
 from .const import DOMAIN
 
