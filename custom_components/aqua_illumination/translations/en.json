@@ -1,0 +1,20 @@
+{
+      "config": {
+          "step": {
+                "user": {
+                        "title": "Connect to AI Light",
+                                "description": "Enter the connection details for your AquaIllumination light.",
+                                        "data": {
+                                                  "host": "IP Address",
+                                                            "name": "Device Name"
+                                                                    }
+                                                                          }
+                                                                              },
+                                                                                  "error": {
+                                                                                        "cannot_connect": "Failed to connect to the light. Check the IP."
+                                                                                            },
+                                                                                                "abort": {
+                                                                                                      "already_configured": "Device is already configured"
+                                                                                                          }
+                                                                                                            }
+                                                                                                            }
