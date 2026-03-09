@@ -1,0 +1,13 @@
+{
+  "domain": "aqua_illumination",
+  "name": "Aqua Illumination",
+  "codeowners": ["@razza-t", "@mcclown", "@zonyl"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/razza-t/aqua_illumination-ha",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/razza-t/aqua_illumination-ha/issues",
+  "requirements": [],
+  "version": "2026.3.1"
+}
