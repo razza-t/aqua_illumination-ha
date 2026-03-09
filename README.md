@@ -1,10 +1,10 @@
-# 馃寠 Aqua Illumination for Home Assistant (2026 Modernized)
+# Aqua Illumination for Home Assistant (2026 Modernized)
 
 A modernized, high-performance Home Assistant integration for **Aqua Illumination (AI)** lights. Re-engineered to support **HA 2026.3+** and **Python 3.14+**.
 
 
 
-## 馃洜 2026 Modernization Fixes
+## 2026 Modernization Fixes
 * **UI-Based Configuration:** Full support for **Config Flow**. No more editing `configuration.yaml`鈥攁dd your lights directly through the Home Assistant interface.
 * **Zero Dependency Errors:** The `aquaipy` logic is now "vendored" (bundled) inside the component, fixing installation failures on Home Assistant Green, Yellow, and Raspberry Pi OS.
 * **Native Entity Grouping:** All color channels (Deep Blue, UV, Cool White, etc.) are automatically grouped under a single Device for a cleaner, more organized UI.
@@ -12,7 +12,7 @@ A modernized, high-performance Home Assistant integration for **Aqua Illuminatio
 
 ---
 
-## 鈿狅笍 Important: Parent/Child Setup
+## Important: Parent/Child Setup
 If you have multiple AI lights paired together in a **Parent/Child (Master/Slave)** configuration:
 * **ONLY add the IP address of the Parent light.**
 * The Parent light manages the communication for all paired children. 
@@ -20,7 +20,7 @@ If you have multiple AI lights paired together in a **Parent/Child (Master/Slave
 
 ---
 
-## 鉁� Features
+## Features
 * **Individual Channel Control:** Every LED color channel (Deep Blue, Royal Blue, Cool White, UV, etc.) appears as a dimmable light entity.
 * **Brightness Sensors:** Real-time percentage sensors for every channel鈥攑erfect for History Graphs and Energy dashboards.
 * **Scheduled Mode Switch:** A dedicated toggle to switch between the light's **Internal AI Schedule** and **Manual HA Control**.
@@ -28,7 +28,7 @@ If you have multiple AI lights paired together in a **Parent/Child (Master/Slave
 
 ---
 
-## 馃殌 Installation
+## Installation
 
 ### Option 1: HACS (Recommended)
 1.  Open **HACS** in your Home Assistant sidebar.
@@ -45,7 +45,7 @@ If you have multiple AI lights paired together in a **Parent/Child (Master/Slave
 
 ---
 
-## 鈿欙笍 How to Setup
+## How to Setup
 1.  Navigate to **Settings > Devices & Services**.
 2.  Click **+ Add Integration** in the bottom right.
 3.  Search for **Aqua Illumination**.
@@ -54,16 +54,16 @@ If you have multiple AI lights paired together in a **Parent/Child (Master/Slave
 
 ---
 
-## 馃搲 Known Caveats
+## Known Caveats
 * **Compatibility:** Tested only with Hydra 26HD. Likely also works with Prime HD, Hydra 26HD, 52HD, 32HD, 64HD.
 * **Network Latency:** Since commands are sent per-channel, adjusting multiple sliders simultaneously may result in a very slight stagger.
 * **HD Overdrive:** This integration supports 0-100% brightness. Values above 100% (the "HD" boost) are currently best managed via the internal AI schedule.
 
 ---
 
-## 馃摐 Credits
+## Credits
 * **Original Integration:** Created by **@zonyl** and **@mcclown**.
 * **Core API Library:** Powered by **`AquaIPy`** by **@chkuendig**.
-* **2026 Modernization:** Updated for modern HA standards by @razza-t with help from ai to check and generate code
+* **2026 Modernization:** Updated for modern HA standards by **@razza-t** with help from ai to check and generate code.
 
 *Disclaimer: This module is not officially endorsed by or affiliated with AquaIllumination. Use at your own risk.*
