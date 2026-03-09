@@ -1,9 +1,0 @@
-{
-  "name": "Aqua Illumination (2026 Fix)",
-  "content_type": "integration",
-  "domains": ["aqua_illumination"],
-  "homeassistant": "2026.3.0",
-  "iot_class": "local_polling",
-  "render_readme": true
-}
-
