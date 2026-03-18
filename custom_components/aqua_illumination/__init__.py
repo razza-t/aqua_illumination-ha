@@ -3,8 +3,6 @@ from datetime import timedelta
 import logging
 
 from homeassistant.const import CONF_HOST, CONF_NAME, Platform
-from homeassistant.helpers import discovery
-import homeassistant.helpers.config_validation as cv
 from homeassistant.util import Throttle, dt
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -22,14 +20,11 @@ PLATFORMS = [Platform.LIGHT, Platform.SWITCH, Platform.SENSOR]
 
 SCAN_INTERVAL = timedelta(seconds=10)
 
-# Make absolutely sure this executes the function to create the schema object
-CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
-
-async def async_setup(hass: HomeAssistant, config: dict) -> bool:
-    """Set up the AquaIllumination component (Legacy/YAML support)."""
-    # Safely initialize the data dictionary
-    hass.data.setdefault(DATA_INDEX, {})
-    return True
+# ==========================================
+# NOTE: CONFIG_SCHEMA and async_setup() have 
+# been completely removed. They are not needed 
+# for UI-configured integrations.
+# ==========================================
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Aqua Illumination from a UI config entry."""
