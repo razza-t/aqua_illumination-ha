@@ -24,11 +24,9 @@ SCAN_INTERVAL = timedelta(seconds=10)
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
-async def async_setup(hass: HomeAssistant, config: dict):
-    """Set up the AquaIllumination component."""
-
-async def async_setup(hass: HomeAssistant, config: dict):
+async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the AquaIllumination component (Legacy/YAML support)."""
+    # This ensures the data index exists even if no config entries are present yet
     if DATA_INDEX not in hass.data:
         hass.data[DATA_INDEX] = {}
     return True
