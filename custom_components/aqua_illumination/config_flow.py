@@ -61,9 +61,10 @@ class AquaIlluminationConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 class AquaIlluminationOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle options for the integration (e.g., changing IP later)."""
-
-    def __init__(self, config_entry):
+    
+def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialize options flow."""
+        # This line handles the assignment for you in a safe way:
         super().__init__(config_entry)
 
     async def async_step_init(self, user_input=None):
