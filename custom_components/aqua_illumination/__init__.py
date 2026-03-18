@@ -22,19 +22,19 @@ PLATFORMS = [Platform.LIGHT, Platform.SWITCH, Platform.SENSOR]
 
 SCAN_INTERVAL = timedelta(seconds=10)
 
+# Make absolutely sure this executes the function to create the schema object
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     """Set up the AquaIllumination component (Legacy/YAML support)."""
-    # This ensures the data index exists even if no config entries are present yet
-    if DATA_INDEX not in hass.data:
-        hass.data[DATA_INDEX] = {}
+    # Safely initialize the data dictionary
+    hass.data.setdefault(DATA_INDEX, {})
     return True
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Aqua Illumination from a UI config entry."""
-    if DATA_INDEX not in hass.data:
-        hass.data[DATA_INDEX] = {}
+    # Ensure the data dictionary exists before we try to add to it
+    hass.data.setdefault(DATA_INDEX, {})
 
     host = entry.data.get("host")
     name = entry.data.get("name")
@@ -55,7 +55,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
-        hass.data[DATA_INDEX].pop(entry.entry_id)
+        # Safely remove the entry data when unloading
+        hass.data[DATA_INDEX].pop(entry.entry_id, None)
 
     return unload_ok
 
