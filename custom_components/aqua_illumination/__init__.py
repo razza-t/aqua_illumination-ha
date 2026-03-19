@@ -1,11 +1,11 @@
 """The AquaIllumination Light component."""
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
-from homeassistant.const import CONF_HOST, CONF_NAME, Platform
-from homeassistant.util import Throttle, dt
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.util import Throttle, dt
 
 # Internal Imports
 from .const import DOMAIN
@@ -13,22 +13,18 @@ from .const import DOMAIN
 _LOGGER = logging.getLogger(__name__)
 
 ATTR_LAST_UPDATE = 'last_update'
-DATA_INDEX = "data_" + DOMAIN
+DATA_INDEX = f"data_{DOMAIN}"
 
 # 2026.3 Standard: Explicitly define platforms
 PLATFORMS = [Platform.LIGHT, Platform.SWITCH, Platform.SENSOR]
-
 SCAN_INTERVAL = timedelta(seconds=10)
 
-# ==========================================
-# NOTE: CONFIG_SCHEMA and async_setup() have 
-# been completely removed. They are not needed 
-# for UI-configured integrations.
-# ==========================================
+async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+    """Set up the component. This is required for the integration to index properly."""
+    return True
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Aqua Illumination from a UI config entry."""
-    # Ensure the data dictionary exists before we try to add to it
     hass.data.setdefault(DATA_INDEX, {})
 
     host = entry.data.get("host")
@@ -41,25 +37,22 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Store the device using the unique entry_id
     hass.data[DATA_INDEX][entry.entry_id] = device
 
-    # Forward the setup to the platforms (light, switch, sensor)
+    # Forward the setup to the platforms
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
-        # Safely remove the entry data when unloading
         hass.data[DATA_INDEX].pop(entry.entry_id, None)
-
     return unload_ok
 
 class AIData:
     """Class for handling data from AI devices and caching."""
 
     def __init__(self, host, name, throttle):
-        # FIX: Explicit path for the library
+        # Local import to prevent startup circular dependencies
         from .aquaipy.aquaipy import AquaIPy
 
         self.attr = {}
@@ -98,11 +91,12 @@ class AIData:
 
     async def _async_update(self):
         """Fetch the latest data from the device."""
-        if not self.connected:
+        if not self._connected:
             from .aquaipy.error import FirmwareError, ConnError, MustBeParentError
             
             try:
                 await self._device.async_connect(self._host)
+                self._connected = True
             except FirmwareError:
                 _LOGGER.error("Invalid firmware version for AI device: %s", self.name)
                 return
@@ -112,8 +106,6 @@ class AIData:
             except MustBeParentError:
                 _LOGGER.error("The device at %s must be the parent light.", self._host)
                 return
-
-            self._connected = True
             
         self._colors_brightness = await self._device.async_get_colors_brightness()
         self._schedule_state = await self._device.async_get_schedule_state()
