@@ -61,6 +61,7 @@ class AIData:
         self._t = throttle
         self._colors_brightness = None
         self._schedule_state = None
+        self._power_draw = 0.0
         self._host = host
 
         self.async_update = Throttle(throttle)(self._async_update)
@@ -89,6 +90,11 @@ class AIData:
     def schedule_state(self):
         return self._schedule_state
 
+    @property
+    def power_draw(self):
+        """Return the current calculated power draw."""
+        return self._power_draw
+
     async def _async_update(self):
         """Fetch the latest data from the device."""
         if not self._connected:
@@ -107,16 +113,11 @@ class AIData:
                 _LOGGER.error("The device at %s must be the parent light.", self._host)
                 return
             
+        # Update all values in one cycle
         self._colors_brightness = await self._device.async_get_colors_brightness()
         self._schedule_state = await self._device.async_get_schedule_state()
+        
+        # New: Get the power draw calculation from aquaipy
+        self._power_draw = await self._device.async_get_current_power_draw()
+        
         self.attr[ATTR_LAST_UPDATE] = dt.utcnow()
-    async def _async_update_data(self):
-        """Fetch data from API endpoint."""
-        try:
-            # Fetch standard color/brightness data
-            data = await self.ai.async_get_colors_brightness()
-            # Fetch the new power draw calculation
-            data["power_draw"] = await self.ai.async_get_current_power_draw()
-            return data
-        except Exception as err:
-            raise UpdateFailed(f"Error communicating with API: {err}")
