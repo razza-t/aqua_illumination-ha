@@ -110,3 +110,13 @@ class AIData:
         self._colors_brightness = await self._device.async_get_colors_brightness()
         self._schedule_state = await self._device.async_get_schedule_state()
         self.attr[ATTR_LAST_UPDATE] = dt.utcnow()
+    async def _async_update_data(self):
+        """Fetch data from API endpoint."""
+        try:
+            # Fetch standard color/brightness data
+            data = await self.ai.async_get_colors_brightness()
+            # Fetch the new power draw calculation
+            data["power_draw"] = await self.ai.async_get_current_power_draw()
+            return data
+        except Exception as err:
+            raise UpdateFailed(f"Error communicating with API: {err}")
