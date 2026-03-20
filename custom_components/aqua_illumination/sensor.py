@@ -120,7 +120,7 @@ class AIDiagnosticSensor(SensorEntity):
             return self._device.raw_device.firmware_version
         if self._type == "connection":
             return "Connected" if self._device.connected else "Disconnected"
-        return None        }
+        return None
 
     @property
     def extra_state_attributes(self):
