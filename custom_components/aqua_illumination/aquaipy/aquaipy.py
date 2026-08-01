@@ -374,3 +374,21 @@ class AquaIPy:
 
         brightness[color] += value
         return await self.async_set_colors_brightness(brightness)
+    async def async_get_current_power_draw(self):
+        """Calculate the current total power draw in Watts."""
+        resp_b, intensities = await self._async_get_brightness()
+        if resp_b != Response.Success:
+            return 0.0
+
+        total_mw = 0
+        # Sum mW for the primary light
+        for color, intensity in intensities.items():
+            total_mw += self._primary_device.convert_to_mw(color, intensity)
+        
+        # Sum mW for any linked 'other' devices
+        for device in self._other_devices:
+            for color, intensity in intensities.items():
+                total_mw += device.convert_to_mw(color, intensity)
+
+        # Convert milliwatts to Watts
+        return round(total_mw / 1000.0, 2)
