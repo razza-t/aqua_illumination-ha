@@ -20,7 +20,7 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up Aqua Illumination sensors from a config entry."""
-    DATA_INDEX = "data_" + DOMAIN
+    DATA_INDEX = f"data_{DOMAIN}"
     device = hass.data[DATA_INDEX][entry.entry_id]
 
     # Initialize basic diagnostic and power sensors
@@ -95,47 +95,6 @@ class AIChannelBrightnessSensor(SensorEntity):
         return None
 
     async def async_update(self) -> None:
-        await self._device.async_update()
-
-
-class AIDiagnosticSensor(SensorEntity):
-    """Firmware and Connection status sensors."""
-
-    _attr_has_entity_name = True
-    _attr_entity_category = EntityCategory.DIAGNOSTIC
-
-    def __init__(self, device, name, sensor_type):
-        self._device = device
-        self._type = sensor_type
-        self._attr_name = name
-        self._attr_unique_id = f"{device.mac_addr}_{sensor_type}"
-        self._attr_device_info = {
-            "identifiers": {(DOMAIN, device.mac_addr)},
-            "name": device.name,
-        }
-
-    @property
-    def native_value(self):
-        if self._type == "firmware":
-            return self._device.raw_device.firmware_version
-        if self._type == "connection":
-            return "Connected" if self._device.connected else "Disconnected"
-        return None
-
-    @property
-    def extra_state_attributes(self):
-        """Return device-specific attributes."""
-        return self._device.attr
-
-    @property
-    def native_value(self):
-        """Return the current percentage."""
-        if self._device.colors_brightness and self._channel in self._device.colors_brightness:
-            return round(float(self._device.colors_brightness[self._channel]), 2)
-        return None
-
-    async def async_update(self) -> None:
-        """Fetch new state data."""
         await self._device.async_update()
 
 
