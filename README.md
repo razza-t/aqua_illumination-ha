@@ -1,6 +1,6 @@
 # Aqua Illumination for Home Assistant (2026 Modernized)
 
-A modernized, high-performance Home Assistant integration for **Aqua Illumination (AI)** lights. Re-engineered to support **HA 2026.3+** and **Python 3.14+**.
+A modernized, high-performance Home Assistant integration for WiFi controlled **Aqua Illumination (AI)** lights. Re-engineered to support **HA 2026.3+** and **Python 3.14+**.
 
 
 
