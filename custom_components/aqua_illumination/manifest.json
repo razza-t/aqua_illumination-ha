@@ -9,5 +9,5 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/razza-t/aqua_illumination-ha/issues",
   "requirements": [],
-  "version": "v2026.3.2"
+  "version": "v2026.4.0"
 }
