@@ -1,7 +1,7 @@
 {
   "domain": "aqua_illumination",
   "name": "Aqua Illumination",
-  "codeowners": ["@razza-t", "@mcclown", "@zonyl"],
+  "codeowners": ["@razza-t"],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/razza-t/aqua_illumination-ha",
