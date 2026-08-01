@@ -9,6 +9,7 @@ A modernized, high-performance Home Assistant integration for **Aqua Illuminatio
 * **Zero Dependency Errors:** The `aquaipy` logic is now "vendored" (bundled) inside the component, fixing installation failures on Home Assistant Green, Yellow, and Raspberry Pi OS.
 * **Native Entity Grouping:** All color channels (Deep Blue, UV, Cool White, etc.) are automatically grouped under a single Device for a cleaner, more organized UI.
 * **Modern Entity Compliance:** Updated with 2026 `ColorMode` and `SensorDeviceClass` standards to ensure long-term stability.
+* **Energy tracker:** Creates a power sensor to keep track of power consumed by the lights.
 
 ---
 
